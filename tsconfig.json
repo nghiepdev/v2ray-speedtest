@@ -3,6 +3,8 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "noEmit": true
-  }
+    "noEmit": true,
+    "baseUrl": "src"
+  },
+  "exclude": ["node_modules"]
 }

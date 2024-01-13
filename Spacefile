@@ -7,8 +7,9 @@ micros:
     primary: true
     public: true
     include:
+      - package.json
       - tsconfig.json
       - bin
       - src
       - node_modules
-    run: 'NODE_ENV=production ./node_modules/.bin/tsx src'
+    run: 'NODE_ENV=production node --loader tsx src'
