@@ -12,6 +12,8 @@ import type {
   ProxyServerTest,
 } from './typing';
 
+const PORT = process.env.PORT || 4000;
+
 const server = new http.Server(
   serve(async (req, res) => {
     const url = new URL(req.url ?? '', `http://${req.headers.host}`);
@@ -81,6 +83,6 @@ const server = new http.Server(
   })
 );
 
-server.listen(3000, () => {
-  console.info(`⚡⚡⚡ Listening on http://localhost:3000`);
+server.listen(PORT, () => {
+  console.info(`⚡⚡⚡ Listening on http://localhost:${PORT}`);
 });

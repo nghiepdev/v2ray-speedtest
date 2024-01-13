@@ -7,7 +7,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 RUN corepack prepare pnpm@8 --activate
 
-EXPOSE 3000
+EXPOSE 4000
 
 WORKDIR /app
 
