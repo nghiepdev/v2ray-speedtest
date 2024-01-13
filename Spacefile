@@ -1,0 +1,14 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: v2ray-speedtest
+    src: ./
+    engine: nodejs16
+    primary: true
+    public: true
+    include:
+      - tsconfig.json
+      - bin
+      - src
+      - node_modules
+    run: 'NODE_ENV=production ./node_modules/.bin/tsx src'
