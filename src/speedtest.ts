@@ -7,11 +7,11 @@ export async function speedtest(url: string) {
     path.resolve('bin/speedtest.config.json'),
     '--test',
     url,
-  ])?.pipeStderr?.(execa('cat'));
+  ]);
 
-  if (ps?.failed) {
+  if (ps.failed) {
     throw new Error(ps.stderr || 'Unknown error!!!');
   }
 
-  return ps?.stdout;
+  return ps.stderr;
 }

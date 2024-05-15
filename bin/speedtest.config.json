@@ -5,7 +5,7 @@
   "sortMethod": "rspeed",
   "concurrency": 1,
   "testMode": 2,
-  "timeout": 12,
+  "timeout": 5,
   "language": "en",
   "fontSize": 24,
   "theme": "rainbow",
