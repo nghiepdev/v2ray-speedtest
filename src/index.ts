@@ -25,61 +25,60 @@ const server = new http.Server(
       proxy = (await text(req)) || proxy;
     }
 
-    if (proxy) {
-      const lines: string[] = ((await speedtest(proxy)) ?? '').split('\n');
+    // Validate proxy before use
+    new URL(proxy);
 
-      const {servers} = JSON.parse(
-        lines
-          .find(line =>
-            line.includes(`\"info\":\"gotservers\"` satisfies PairInfoString)
-          )
-          ?.match(/{.*}/)
-          ?.at(0) ?? ''
-      ) as {
-        servers: ProxyServer[];
-      };
+    const lines: string[] = ((await speedtest(proxy)) ?? '').split('\n');
 
-      const gotpings: GotPing[] = lines
-        .filter(line =>
-          line.includes(`\"info\":\"gotping\"` satisfies PairInfoString)
+    const {servers} = JSON.parse(
+      lines
+        .find(line =>
+          line.includes(`\"info\":\"gotservers\"` satisfies PairInfoString)
         )
-        .map(gotping => JSON.parse(gotping.match(/{.*}/)?.at(0) ?? ''));
+        ?.match(/{.*}/)
+        ?.at(0) ?? ''
+    ) as {
+      servers: ProxyServer[];
+    };
 
-      const gotspeeds: GotSpeed[] = lines
-        .filter(line =>
-          line.includes(`\"info\":\"gotspeed\"` satisfies PairInfoString)
-        )
-        .map(gotping => JSON.parse(gotping.match(/{.*}/)?.at(0) ?? ''));
+    const gotpings: GotPing[] = lines
+      .filter(line =>
+        line.includes(`\"info\":\"gotping\"` satisfies PairInfoString)
+      )
+      .map(gotping => JSON.parse(gotping.match(/{.*}/)?.at(0) ?? ''));
 
-      const result = servers.map(({id, remarks, protocol}) => {
-        const gotspeed = gotspeeds.reduce(
-          (acc, {speed, maxspeed}) => {
-            return {
-              ...acc,
-              speed: acc.speed + bytes.parse(speed),
-              maxspeed: acc.maxspeed + bytes.parse(maxspeed),
-            };
-          },
-          {
-            speed: 0,
-            maxspeed: 0,
-          } satisfies {speed: number; maxspeed: number}
-        );
-        return {
-          remarks,
-          protocol,
-          ping: gotpings.find(gotping => gotping.id === id)?.ping ?? 0,
-          speed: bytes.format(gotspeed.speed / (gotspeeds.length ?? 1)),
-          maxspeed: bytes.format(gotspeed?.maxspeed / (gotspeeds.length ?? 1)),
-        } satisfies ProxyServerTest;
-      });
+    const gotspeeds: GotSpeed[] = lines
+      .filter(line =>
+        line.includes(`\"info\":\"gotspeed\"` satisfies PairInfoString)
+      )
+      .map(gotping => JSON.parse(gotping.match(/{.*}/)?.at(0) ?? ''));
 
-      return send(res, 200, {
-        servers: result,
-      });
-    }
+    const result = servers.map(({id, remarks, protocol}) => {
+      const gotspeed = gotspeeds.reduce(
+        (acc, {speed, maxspeed}) => {
+          return {
+            ...acc,
+            speed: acc.speed + bytes.parse(speed),
+            maxspeed: acc.maxspeed + bytes.parse(maxspeed),
+          };
+        },
+        {
+          speed: 0,
+          maxspeed: 0,
+        } satisfies {speed: number; maxspeed: number}
+      );
+      return {
+        remarks,
+        protocol,
+        ping: gotpings.find(gotping => gotping.id === id)?.ping ?? 0,
+        speed: bytes.format(gotspeed.speed / (gotspeeds.length ?? 1)),
+        maxspeed: bytes.format(gotspeed?.maxspeed / (gotspeeds.length ?? 1)),
+      } satisfies ProxyServerTest;
+    });
 
-    return send(res, 404, 'Page not found');
+    return send(res, 200, {
+      servers: result,
+    });
   })
 );
 
